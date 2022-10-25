@@ -1,28 +1,25 @@
-const express = require("express");
-const bodyParser = require("body-parser");
-const cors = require("cors");
+'use strict';
+// Load .env File
+require('dotenv').config();
+const chalk = require('chalk');
+const packageInfo = require('./package.json');
+console.log(chalk.greenBright.bold('⬤  CALMAPI - Keep Calm and REST'));
+console.log(chalk.greenBright.bold('\n✔ Project: ', packageInfo.name, `v${ packageInfo.version}`));
+console.log(chalk.greenBright.bold('✔ CalmAPI Version: ', packageInfo.generatorVersion));
+console.log(chalk.greenBright('✔ Application Started'));
+// Load Database
+require('./system/configs/database');
 
-const app = express();
+// Load Server
+const { server } = require('./system/configs/server');
+const { config } = require('./system/configs/config');
 
-var corsOptions = {
-    origin: "http://localhost:8081",
-};
-
-app.use(cors(corsOptions));
-
-// parse requests of content-type - application/json
-app.use(bodyParser.json());
-
-// parse requests of content-type - application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: true }));
-
-// simple route
-app.get("/", (req, res) => {
-    res.json({ message: "Welcome to bezkoder application." });
-});
-
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}.`);
+const PORT = process.env.PORT || config.PORT;
+server.listen(PORT).on('error', (err) => {
+    console.log(chalk.red('✘ Sorry!! Something just broke.'));
+    console.error(chalk.red('✘', err.message));
+    process.exit(0);
+}).on('listening', () => {
+    console.log(chalk.greenBright('✔ Listening on port', PORT));
+    console.log(chalk.greenBright.bold(`✔ Endpoint Base URL: http://127.0.0.1:${PORT}`));
 });
